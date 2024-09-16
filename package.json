@@ -1,0 +1,28 @@
+{
+  "name": "brainwave-chatbot",
+  "version": "1.0.0",
+  "description": "FAC30 Repo for Brainwave's Chatbot",
+  "main": "js/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fac30/Pro02_Max_Itzi_Josh_Riley.git"
+  },
+  "keywords": [
+    "template",
+    "repo",
+    "node",
+    "web"
+  ],
+  "author": "Maxime Downe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fac30/Pro02_Max_Itzi_Josh_Riley/issues"
+  },
+  "homepage": "https://github.com/fac30/Pro02_Max_Itzi_Josh_Riley#readme",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
