@@ -3,7 +3,7 @@ const config = require('./config');
 const { handleMessage } = require('./events/messageCreate');
 const { handleReady } = require('./events/ready');
 
-// Initialize Discord client with necessary intents
+// Initialize Discord client with necessary intents and partials
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,               // Allows the bot to connect to guilds (servers)

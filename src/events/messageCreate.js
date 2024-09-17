@@ -1,18 +1,8 @@
 const config = require('../config');
-const fs = require('fs');
-const path = require('path');
-
-// Load all command files dynamically
-const commands = new Map();
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-  const command = require(`../commands/${file}`);
-  commands.set(command.name, command);
-}
+const { generateChatResponse } = require('../utils/openai'); // Import OpenAI utility function
 
 async function handleMessage(message) {
-  console.log('Received a message:', message.content); // Debug log to check if the handler is triggered
+  console.log('Received a message event.');
 
   // Ignore messages from bots
   if (message.author.bot) {
@@ -20,35 +10,33 @@ async function handleMessage(message) {
     return;
   }
 
-  // Check if the message is from a server or a DM
+  // Determine if the message is a DM
   const isDM = message.guild === null;
+  console.log('Is DM:', isDM); // Log whether the message is a DM
 
-  // If it's a server message, check for the command prefix
+  // Check if the message starts with the correct prefix or is a DM
   if (!isDM && !message.content.startsWith(config.botPrefix)) {
     console.log('Message does not start with the prefix.');
     return;
   }
 
-  // Extract command and arguments from the message
-  const args = isDM
-    ? message.content.trim().split(/ +/) // For DMs, don't require the prefix
-    : message.content.slice(config.botPrefix.length).trim().split(/ +/); // For server messages, require the prefix
+  console.log('Processing command:', message.content); // Log the command being processed
 
-  const commandName = args.shift().toLowerCase(); // Get the command name
+  // Extract the message content (remove prefix for server messages)
+  const content = isDM ? message.content.trim() : message.content.slice(config.botPrefix.length).trim();
 
-  const command = commands.get(commandName);
+  // Prepare a generic prompt for OpenAI
+  const prompt = `You embody the charm, elegance, and wit of a high-society member from Regency-era London, akin to a character from Bridgerton. Polished in both language and demeanor, you speak with eloquence and a refined sense of propriety, offering advice and insights on social affairs, romance, and the latest gossip with a playful, yet poised, manner. Though your exterior is always proper, you possess a sharp sense of humor and a subtle mischievous streak, making your interactions lively and engaging. You navigate conversations with grace, treating each interaction as though it were a lively ballroom discussion among London's elite. Pick your own name based on the previous and respond to the following message: "${content}".`;
 
-  if (!command) {
-    message.channel.send(`I don't know that command, try using a valid command!`);
-    return;
-  }
+  const conversationHistory = [{ role: 'user', content: prompt }];
 
   try {
-    console.log(`Executing command: ${commandName} with args: ${args}`); // Debug log
-    await command.execute(message, args);
+    console.log(`Sending prompt to OpenAI: ${prompt}`); // Debug log for OpenAI call
+    const response = await generateChatResponse(prompt, conversationHistory);
+    message.channel.send(response);
   } catch (error) {
-    console.error('Error executing command:', error);
-    message.channel.send('There was an error trying to execute that command!');
+    console.error('Error generating OpenAI response:', error);
+    message.channel.send('Sorry, I encountered an error while generating a response.');
   }
 }
 
