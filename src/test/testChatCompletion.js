@@ -1,15 +1,14 @@
 const { OpenAI } = require('openai');
+const config = require('../config');
 
-// Initialize OpenAI with your API key
 const openai = new OpenAI({
-  apiKey: 'your-api-key'
+  apiKey: config.openaiApiKey
 });
 
-// Function to get a chat completion from OpenAI
 async function testChatCompletion(prompt = "Hello, how are you?") {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4", 
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt }
