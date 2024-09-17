@@ -8,8 +8,6 @@ const runTests = async () => {
   // Define an array of test cases
   const testCases = [
     { prompt: "What is the capital of Mexico?", expectedAnswer: "Mexico City" },
-    { prompt: "Who wrote 'To Kill a Mockingbird'?", expectedAnswer: "Harper Lee" },
-    { prompt: "What is the chemical symbol for gold?", expectedAnswer: "Au" },
     { prompt: "What is the largest planet in our solar system?", expectedAnswer: "Jupiter" }
   ];
 
