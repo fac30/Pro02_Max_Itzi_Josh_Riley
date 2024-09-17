@@ -2,7 +2,7 @@
   "name": "brainwave-chatbot",
   "version": "1.0.0",
   "description": "FAC30 Repo for Brainwave's Chatbot",
-  "main": "js/main.js",
+  "main": "src/bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
