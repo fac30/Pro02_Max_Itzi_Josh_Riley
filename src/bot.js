@@ -1,15 +1,17 @@
-const { Client, GatewayIntentBits, Events } = require('discord.js'); // Import Discord.js
-const config = require('./config'); // Import the configuration settings
-const { handleMessage } = require('./events/messageCreate'); // Import the message event handler
-const { handleReady } = require('./events/ready'); // Import the ready event handler
+const { Client, GatewayIntentBits, Events } = require('discord.js');
+const config = require('./config');
+const { handleMessage } = require('./events/messageCreate');
+const { handleReady } = require('./events/ready');
 
-// Initialize Discord client
+// Initialize Discord client with necessary intents
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.Guilds,               // Allows the bot to connect to guilds (servers)
+    GatewayIntentBits.GuildMessages,        // Allows the bot to receive messages from guilds
+    GatewayIntentBits.MessageContent,       // Required to read message content
+    GatewayIntentBits.DirectMessages,       // Allows the bot to receive direct messages
   ],
+  partials: ['CHANNEL'], // Required to handle DMs properly
 });
 
 // Set up event listeners
