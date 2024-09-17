@@ -1,20 +1,21 @@
-const { OpenAI } = require('openai'); // Import both Configuration and OpenAIApi
-const config = require('../config'); // Import the configuration settings
-
+const { OpenAI } = require('openai'); // Import the OpenAI class
+const config = require('../config'); // Import your configuration settings
 
 // Initialize OpenAI API client
 const openai = new OpenAI({
-    apiKey: config.openaiApiKey, // Use your OpenAI API key from config
-  });
+  apiKey: config.openaiApiKey, // Use your OpenAI API key from config
+});
 
 async function generateChatResponse(prompt, conversationHistory) {
   try {
-    const response = await openai.createChatCompletion({
+    console.log('Calling OpenAI API...'); // Debug log
+    const response = await openai.chat.completions.create({
       model: config.openaiModel,
       messages: conversationHistory,
     });
 
-    return response.data.choices[0].message.content;
+    console.log('OpenAI API response:', response); // Log the response
+    return response.choices[0].message.content;
   } catch (error) {
     console.error('Error generating response from OpenAI:', error);
     throw error;
