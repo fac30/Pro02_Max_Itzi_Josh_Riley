@@ -1,29 +1,22 @@
-const { Configuration, OpenAIApi } = require('openai');
-const config = require('./config');
+const { Client, GatewayIntentBits, Events } = require('discord.js'); // Import Discord.js
+const config = require('./config'); // Import the configuration settings
+const { handleMessage } = require('./events/messageCreate'); // Import the message event handler
+const { handleReady } = require('./events/ready'); // Import the ready event handler
 
-// Access configuration settings
-const discordToken = config.discordToken;
-const openaiApiKey = config.openaiApiKey;
-const botPrefix = config.botPrefix;
+// Initialize Discord client
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
-// Example usage
-client.login(discordToken);
+// Set up event listeners
+client.once(Events.ClientReady, () => handleReady(client));
+client.on(Events.MessageCreate, handleMessage);
 
-// Initialize OpenAI API
-const openai = new OpenAIApi(new Configuration({
-    apiKey: config.openaiApiKey,
-}));
-  
-async function generateChatResponse(prompt, conversationHistory) {
-    try {
-      const response = await openai.createChatCompletion({
-        model: config.openaiModel, // Use the model from the config
-        messages: conversationHistory,
-      });
-  
-        return response.data.choices[0].message.content;
-    } catch (error) {
-        console.error('Error generating response:', error);
-        throw error;
-    }
-}
+// Log in to Discord
+client.login(config.discordToken)
+  .then(() => console.log('Bot logged in successfully.'))
+  .catch(err => console.error('Failed to log in:', err));
