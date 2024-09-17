@@ -1,14 +1,14 @@
 const { generateChatResponse } = require('../utils/openai'); // Import the OpenAI utility for generating responses
 
 module.exports = {
-  name: 'pep', // Command name
-  description: 'Critique a user-provided description of football opinions as if you were Pep Guardiola.',
+  name: 'pep.js', // Command name
+  description: 'give opinion on a user-provided description of football opinions as if you were Pep Guardiola.',
   async execute(message, args) {
     // Combine all arguments to form the food description
     const footballOpinions = args.join(' ');
 
     if (!footballOpinions) {
-      message.channel.send("You want me to critique, but you don't even describe the food? Come on!");
+      message.channel.send("You want me to give an opinion, but you don't even know about football? Wake up.");
       return;
     }
 
@@ -24,7 +24,7 @@ module.exports = {
       message.channel.send(response);
     } catch (error) {
       console.error('Error in critique command execution:', error);
-      message.channel.send('Oh no, something went wrong! Even the AI can’t handle your cooking...');
+      message.channel.send('Oh no, something went wrong! Even the AI can’t handle your horrible football opinions...');
     }
   },
 };
