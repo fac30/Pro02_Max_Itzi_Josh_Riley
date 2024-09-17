@@ -23,6 +23,11 @@
   },
   "homepage": "https://github.com/fac30/Pro02_Max_Itzi_Josh_Riley#readme",
   "dependencies": {
-    "express": "^4.21.0"
+    "discord.js": "^14.16.2",
+    "express": "^4.21.0",
+    "openai": "^4.61.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.10.0"
   }
 }
