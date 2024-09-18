@@ -9,10 +9,9 @@ module.exports = {
     // Get the search term from the user's command input (args)
     const searchTerms = ['face palm', 'eye roll', 'fed up'];
     const searchTerm = searchTerms[Math.floor(Math.random() * searchTerms.length)];
-    const apiKey = config.giphyApiKey;
 
     // Construct Giphy API URL
-    const url = `https://api.giphy.com/v1/gifs/random?api_key=05cOk3nUvTJ2K4TZ8cX3wLdzfDQvCZ2b&tag=${encodeURIComponent(searchTerm)}&rating=G`
+    const url = `https://api.giphy.com/v1/gifs/random?api_key=${config.giphyApiKey}&tag=${encodeURIComponent(searchTerm)}&rating=G`
 
     try {
       // Fetch a GIF from Giphy
