@@ -4,7 +4,7 @@ module.exports = {
   name: 'pep.js', // Command name
   description: 'give opinion on a user-provided description of football opinions as if you were Pep Guardiola.',
   async execute(message, args) {
-    // Combine all arguments to form the food description
+    // Combine all arguments to form the football opinion
     const footballOpinions = args.join(' ');
 
     if (!footballOpinions) {
