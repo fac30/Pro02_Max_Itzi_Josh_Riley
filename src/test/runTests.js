@@ -1,4 +1,5 @@
 // Import the test files below
+const testBotLogin = require('./testBotLogin.js');
 const testChatCompletion = require('./testChatCompletion.js');
 
 // A function to run all tests
@@ -31,6 +32,7 @@ const runTests = async () => {
   }
 
   // Add calls to other test modules below
+  testBotLogin();
 };
 
 // Run all tests
