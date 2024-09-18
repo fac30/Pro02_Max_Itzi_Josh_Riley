@@ -31,19 +31,11 @@ async function handleMessage(message) {
   const conversationHistory = [{ role: 'user', content: prompt }];
 
   try {
-    // Log the prompt being sent to OpenAI for debugging purposes
-    console.log(`Sending prompt to OpenAI: ${prompt}`);
-
-    // Await the response from the generateChatResponse function, which generates a response based on the prompt and conversation history
+    console.log(`Sending prompt to OpenAI: ${prompt}`); // Debug log for OpenAI call
     const response = await generateChatResponse(prompt, conversationHistory);
-
-    // Send the generated response to the channel where the message was received
     message.channel.send(response);
-} catch (error) {
-    // Log any errors that occur during the process for debugging
+  } catch (error) {
     console.error('Error generating OpenAI response:', error);
-
-    // Send a generic error message to the channel in case something goes wrong
     message.channel.send('Sorry, I encountered an error while generating a response.');
   }
 }
