@@ -4,7 +4,9 @@
   "description": "FAC30 Repo for Brainwave's Chatbot",
   "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "bot": "nodemon src/bot.js",
+    "slash": "node src/slashCommands.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "openai": "^4.61.1"
   },
   "devDependencies": {
-    "eslint": "^9.10.0"
+    "eslint": "^9.10.0",
+    "nodemon": "^3.1.5"
   }
 }
