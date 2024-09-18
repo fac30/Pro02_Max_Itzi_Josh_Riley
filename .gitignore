@@ -39,6 +39,7 @@ Thumbs.db
 # Modules #
 ###########
 node_modules/
+package-lock.json
 
 # Secrets #
 ###########
