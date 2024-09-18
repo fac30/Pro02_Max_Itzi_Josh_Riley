@@ -41,14 +41,10 @@ function createMockMessage(content, isDM = false) {
   await handleMessage(test4Message);
   assert.ok(!test4Message.channel.lastMessageSent, 'Test 4 Failed: Bot should ignore messages without prefix in server.');
 
-  // Test 5: Handle unknown command
-  const test5Message = createMockMessage('!unknowncommand');
+  // New Test 5: Ensure OpenAI response for non-command input with correct prefix
+  const test5Message = createMockMessage('!tell me a joke');
   await handleMessage(test5Message);
-  assert.strictEqual(
-    test5Message.channel.lastMessageSent,
-    "I don't know that command, try using a valid command!",
-    'Test 5 Failed: Bot did not send an error message for an unknown command.'
-  );
+  assert.ok(test5Message.channel.lastMessageSent, 'Test 5 Failed: Bot did not respond with an OpenAI-generated message for non-command input.');
 
   console.log('All tests passed!');
 })();
