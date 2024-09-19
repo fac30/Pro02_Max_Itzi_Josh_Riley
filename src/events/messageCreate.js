@@ -1,5 +1,5 @@
 const config = require("../../config");
-const { generateChatResponse } = require("../utils/openai"); // Import OpenAI utility function
+const { generateChatResponse } = require("../utils/openai");
 const fs = require("fs");
 const path = require("path");
 const gifCommand = require("../commands/gifGenerator"); // Adjust the path if necessary
@@ -21,7 +21,7 @@ const conversationHistories = {};
 let conversationCounter = 0;
 
 async function handleMessage(message) {
-  console.log("Received message:", message);  // Log the entire message object
+  console.log("Received message:", message.content);  // Log the message content
   
   // Ignore messages from bots
   if (message.author.bot) {
@@ -49,6 +49,23 @@ async function handleMessage(message) {
   }
 
   const userId = message.author.id;
+
+  // Split the message content into words to check for commands
+  const args = content.split(/ +/);
+  const commandName = args.shift().toLowerCase();  // Get the first word as the command
+
+  // Check if the first word is a command
+  const command = commands.get(commandName);
+  if (command) {
+    try {
+      console.log(`Executing command: ${commandName}`);
+      await command.execute(message, args);  // Execute the command
+      return;  // If a command is executed, stop further processing
+    } catch (error) {
+      console.error(`Error executing command ${commandName}:`, error);
+      message.channel.send("Sorry, something went wrong while executing that command.");
+    }
+  }
 
   // Check if the message contains a question mark
   if (content.includes("?")) {
