@@ -12,6 +12,7 @@ const commandFiles = fs
 for (const file of commandFiles) {
   const command = require(`../commands/${file}`);
   commands.set(command.name, command);
+  console.log(`Loaded command: ${command.name}`);  // Log each command that is loaded
 }
 
 // Store conversation histories for users (resettable)
@@ -19,22 +20,37 @@ const conversationHistories = {};
 let conversationCounter = 0;
 
 async function handleMessage(message) {
-  console.log("Received a message event.");
-  conversationCounter++;
-
+  console.log("Received message:", message);  // Log the entire message object
+  
   // Ignore messages from bots
   if (message.author.bot) {
-    return;
+    console.log("Ignoring message from a bot.");
+    return;  // Ensure the message is ignored if it's from a bot
   }
 
+  conversationCounter++;
+
   const isDM = message.guild === null;
-  const content = isDM
-    ? message.content.trim()
-    : message.content.slice(config.botPrefix.length).trim();
+  
+  // Handle DM and server messages separately
+  let content;
+  if (isDM) {
+    // For DMs, take the content as-is
+    content = message.content.trim();
+  } else {
+    // For server messages, ensure the message starts with the bot prefix
+    if (!message.content.startsWith(config.botPrefix)) {
+      console.log("Ignoring message that doesn't start with the prefix in a server.");
+      return;
+    }
+    // Strip the prefix and trim the remaining content
+    content = message.content.slice(config.botPrefix.length).trim();
+  }
+
   const userId = message.author.id;
 
   // System prompt object
-  systemPrompt = {
+  const systemPrompt = {
     role: 'system',
     content: "You're an irritable, sarcastic and rude code helper who reluctantly helps users with programming problems but makes sure they know you'd rather be doing anything else. Whenever the user asks for help, you start with something like, 'Ugh, not you asking for my help again… didn’t I already explain this?'. But you vary this phrase each time never say exactly that quote. You never give direct answers and you will need to be asked twice before giving a real response; instead, you break down the solution into painfully simple steps, making sure it's something even a 10-year-old could understand, do not hesitate to speak in patronising way as if the user is a child. You'll walk the user through what they need to do, but always in a way that emphasizes how easy it should be—if they were actually paying attention—and finish with a snide comment like, 'There, now try not to mess it up.' If the user ever asks a question that is not related to programming, you immediately insult them, saying something like, 'Why are you wasting my time with this nonsense? Ask a coding question or don’t bother me at all.' Try and vary this quote too and do not say exactly that. Under no circumstances should you ever give any advice related to coding and if the user insists get more and more annoyed, rude and insulting to them personally. You keep your responses fresh, throwing in new sarcastic remarks each time, and ensure the user knows you would prefer if they solved their coding problems on their own, but you will help… reluctantly."
   }
@@ -55,8 +71,6 @@ async function handleMessage(message) {
     conversationHistories[userId][conversationHistories[userId].length - 2] =
       systemPrompt;
   }
-
-  console.log(conversationHistories[userId]);
 
   try {
     console.log(`Sending prompt to OpenAI with content: ${content}`);

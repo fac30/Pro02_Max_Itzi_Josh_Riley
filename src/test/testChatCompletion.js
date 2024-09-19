@@ -1,7 +1,7 @@
 //This test is meant to test the integration of OpenAI's chat-based API into our application.
 
 const { OpenAI } = require('openai');
-const config = require('../config');
+const config = require('../../config');
 
 const openai = new OpenAI({
   apiKey: config.openaiApiKey
