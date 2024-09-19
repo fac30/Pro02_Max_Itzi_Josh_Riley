@@ -43,4 +43,4 @@ module.exports = {
       message.channel.send('Oh no, something went wrong! Even the AI can’t handle your horrible football opinions...');
     }
   },
-};swa
+};
