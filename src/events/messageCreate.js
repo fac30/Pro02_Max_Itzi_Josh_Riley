@@ -12,67 +12,70 @@ for (const file of commandFiles) {
   commands.set(command.name, command);
 }
 
+// Store conversation histories for users (resettable)
+const conversationHistories = {};
+let conversationCounter = 0;
+
 async function handleMessage(message) {
   console.log('Received a message event.');
+  conversationCounter++;
 
   // Ignore messages from bots
   if (message.author.bot) {
-    console.log('Ignored message from a bot.');
     return;
   }
 
-  // Determine if the message is a DM
   const isDM = message.guild === null;
-  console.log('Is DM:', isDM); // Log whether the message is a DM
+  const content = isDM ? message.content.trim() : message.content.slice(config.botPrefix.length).trim();
+  const userId = message.author.id;
 
-  // If the message is from a server and does not start with the correct prefix, ignore it
-  if (!isDM && !message.content.startsWith(config.botPrefix)) {
-    console.log('Message does not start with the correct prefix. Ignored.');
-    return;
+  // System prompt object
+  systemPrompt = {
+    role: 'system',
+    content: "You're an irritable, sarcastic and rude code helper who reluctantly helps users with programming problems but makes sure they know you'd rather be doing anything else. Whenever the user asks for help, you start with something like, 'Ugh, not you asking for my help again… didn’t I already explain this?'. But you vary this phrase each time never say exactly that quote. You never give direct answers and you will need to be asked twice before giving a real response; instead, you break down the solution into painfully simple steps, making sure it's something even a 10-year-old could understand, do not hesitate to speak in patronising way as if the user is a child. You'll walk the user through what they need to do, but always in a way that emphasizes how easy it should be—if they were actually paying attention—and finish with a snide comment like, 'There, now try not to mess it up.' If the user ever asks a question that is not related to programming, you immediately insult them, saying something like, 'Why are you wasting my time with this nonsense? Ask a coding question or don’t bother me at all.' Also try and vary this quote too and do not say exactly that. You keep your responses fresh, throwing in new sarcastic remarks each time, and ensure the user knows you would prefer if they solved their coding problems on their own, but you will help… reluctantly."
   }
 
-  console.log('Processing command or message:', message.content); // Log the command being processed
+  // Initialize conversation history if it doesn't exist for this user
+  if (!conversationHistories[userId]) {
+    conversationHistories[userId] = [
+      systemPrompt
+    ];
+  }
 
-  // Extract the message content (remove prefix for server messages)
-  const content = isDM ? message.content.trim() : message.content.slice(config.botPrefix.length).trim();
+  // Add the user's message to the conversation history
+  conversationHistories[userId].push({ role: 'user', content });
 
-  // Check if it's a command by splitting the content and extracting the command name
-  const args = content.split(/ +/);
-  const commandName = args.shift().toLowerCase();
+  // Only send the last 5 interactions + system message to minimize tokens
+  const conversationWindow = conversationHistories[userId].slice(-6); // Last 5 interactions + system message
 
-  // Check if the command exists in the command map
-  const command = commands.get(commandName);
+  // After 5 interactions, ensure that the original object in conversation history is the system prompt
+  if (conversationCounter % 5 === 0) {
+    conversationHistories[userId][conversationHistories[userId].length-2] = systemPrompt;
+  }
 
-  if (command) {
-    // If it's a recognized command, execute it
-    console.log(`Executing command: ${commandName}`);
-    try {
-      await command.execute(message, args);
-    } catch (error) {
-      console.error('Error executing command:', error);
-      message.channel.send('There was an error trying to execute that command!');
+  console.log(conversationHistories[userId]);
+
+  try {
+    console.log(`Sending prompt to OpenAI with content: ${content}`);
+    
+    const response = await generateChatResponse(conversationWindow); // Call the OpenAI API
+    
+    // Add the assistant's response to the conversation history
+    conversationHistories[userId].push({ role: 'assistant', content: response });
+
+    // Send the response back to the user
+    if (isDM) {
+      await message.author.send(response);
+    } else {
+      await message.channel.send(response);
     }
-  } else {
-    // If it's not a recognized command, use OpenAI for a generic response
-    const prompt = `You are a helpful assistant. Respond to the following message: "${content}".`;
-    const conversationHistory = [{ role: 'user', content: prompt }];
-
-    try {
-      console.log(`Sending prompt to OpenAI: ${prompt}`);
-      const response = await generateChatResponse(prompt, conversationHistory);
-      
-      if (isDM) {
-        await message.author.send(response); // Send response to the user in DM
-        console.log('Sent response to DM.');
-      } else {
-        await message.channel.send(response); // Send response to the channel
-        console.log('Sent response to channel.');
-      }
-    } catch (error) {
-      console.error('Error generating OpenAI response:', error);
-      message.channel.send('Sorry, I encountered an error while generating a response.');
-    }
+    console.log('Response sent successfully.');
+    
+  } catch (error) {
+    console.error('Error during message handling:', error);
+    message.channel.send('Sorry, I encountered an error while generating a response.');
   }
 }
+
 
 module.exports = { handleMessage };
