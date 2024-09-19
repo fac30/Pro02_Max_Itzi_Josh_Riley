@@ -1,11 +1,13 @@
-const config = require('../config');
-const { generateChatResponse } = require('../utils/openai'); // Import OpenAI utility function
-const fs = require('fs');
-const path = require('path');
+const config = require("../../config");
+const { generateChatResponse } = require("../utils/openai"); // Import OpenAI utility function
+const fs = require("fs");
+const path = require("path");
 
 // Load all command files dynamically
 const commands = new Map();
-const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
+const commandFiles = fs
+  .readdirSync(path.join(__dirname, "../commands"))
+  .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const command = require(`../commands/${file}`);
@@ -17,7 +19,7 @@ const conversationHistories = {};
 let conversationCounter = 0;
 
 async function handleMessage(message) {
-  console.log('Received a message event.');
+  console.log("Received a message event.");
   conversationCounter++;
 
   // Ignore messages from bots
@@ -26,7 +28,9 @@ async function handleMessage(message) {
   }
 
   const isDM = message.guild === null;
-  const content = isDM ? message.content.trim() : message.content.slice(config.botPrefix.length).trim();
+  const content = isDM
+    ? message.content.trim()
+    : message.content.slice(config.botPrefix.length).trim();
   const userId = message.author.id;
 
   // System prompt object
@@ -37,31 +41,34 @@ async function handleMessage(message) {
 
   // Initialize conversation history if it doesn't exist for this user
   if (!conversationHistories[userId]) {
-    conversationHistories[userId] = [
-      systemPrompt
-    ];
+    conversationHistories[userId] = [systemPrompt];
   }
 
   // Add the user's message to the conversation history
-  conversationHistories[userId].push({ role: 'user', content });
+  conversationHistories[userId].push({ role: "user", content });
 
   // Only send the last 5 interactions + system message to minimize tokens
   const conversationWindow = conversationHistories[userId].slice(-6); // Last 5 interactions + system message
 
   // After 5 interactions, ensure that the original object in conversation history is the system prompt
   if (conversationCounter % 5 === 0) {
-    conversationHistories[userId][conversationHistories[userId].length-2] = systemPrompt;
+    conversationHistories[userId][conversationHistories[userId].length - 2] =
+      systemPrompt;
   }
 
   console.log(conversationHistories[userId]);
 
   try {
     console.log(`Sending prompt to OpenAI with content: ${content}`);
-    
+
+    await message.channel.sendTyping();
     const response = await generateChatResponse(conversationWindow); // Call the OpenAI API
-    
+
     // Add the assistant's response to the conversation history
-    conversationHistories[userId].push({ role: 'assistant', content: response });
+    conversationHistories[userId].push({
+      role: "assistant",
+      content: response,
+    });
 
     // Send the response back to the user
     if (isDM) {
@@ -69,13 +76,13 @@ async function handleMessage(message) {
     } else {
       await message.channel.send(response);
     }
-    console.log('Response sent successfully.');
-    
+    console.log("Response sent successfully.");
   } catch (error) {
-    console.error('Error during message handling:', error);
-    message.channel.send('Sorry, I encountered an error while generating a response.');
+    console.error("Error during message handling:", error);
+    message.channel.send(
+      "Sorry, I encountered an error while generating a response."
+    );
   }
 }
-
 
 module.exports = { handleMessage };
