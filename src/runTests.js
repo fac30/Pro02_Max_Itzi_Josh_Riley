@@ -1,5 +1,5 @@
 // Import the test files below
-const config = require('./config.js');
+const config = require('../config.js');
 const testBotLogin = require('./test/testBotLogin.js');
 const testChatCompletion = require('./test/testChatCompletion.js');
 
