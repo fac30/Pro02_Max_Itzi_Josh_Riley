@@ -1,12 +1,12 @@
-const { Client, GatewayIntentBits, Events } = require('discord.js');
-require('dotenv/config'); // Load environment variables
+const { Client, GatewayIntentBits, Events } = require("discord.js");
+require("dotenv/config");
 
 const client = new Client({
   intents: [
     GatewayIntentBits.DirectMessages, // Allows the bot to receive direct messages
     GatewayIntentBits.MessageContent, // Required to read message content
   ],
-  partials: ['CHANNEL'], // Required to handle DMs properly
+  partials: ["CHANNEL"], // Required to handle DMs properly
 });
 
 client.once(Events.ClientReady, () => {
@@ -14,19 +14,20 @@ client.once(Events.ClientReady, () => {
 });
 
 client.on(Events.MessageCreate, (message) => {
-  console.log('Received a message event.');
+  console.log("Received a message event.");
 
   if (message.author.bot) return; // Ignore messages from bots
 
   const isDM = message.guild === null;
-  console.log('Is DM:', isDM); // Log whether the message is a DM
+  console.log("Is a DM:", isDM);
 
   if (isDM) {
-    message.channel.send('Hello! I received your DM.'); // Simple response for testing
+    message.channel.send("Hello! I received your DM."); // Simple response for testing
   }
 });
 
 // Log in to Discord
-client.login(process.env.DISCORD_TOKEN)
-  .then(() => console.log('Bot logged in successfully.'))
-  .catch(err => console.error('Failed to log in:', err));
+client
+  .login(process.env.DISCORD_TOKEN)
+  .then(() => console.log("Bot logged in successfully."))
+  .catch((err) => console.error("Failed to log in:", err));
