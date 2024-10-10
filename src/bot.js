@@ -1,10 +1,7 @@
-// Import required modules from the discord.js library
 const { Client, GatewayIntentBits, Events } = require("discord.js");
 
-// Import configuration file containing the bot's token, guild ID, and channel ID
 const config = require("../config");
 
-// Import custom event handlers for message creation and bot ready events
 const { handleMessage } = require("./events/messageCreate");
 const { handleReady } = require("./events/ready");
 
@@ -26,7 +23,6 @@ const client = new Client({
 
 // Set up event listeners for the bot
 
-// Event listener for when the bot is ready and fully initialized
 client.once(Events.ClientReady, () => {
   handleReady(client); // Call the handleReady function when the bot is ready
 
@@ -43,11 +39,9 @@ client.once(Events.ClientReady, () => {
         wakeUpResponses[Math.floor(Math.random() * wakeUpResponses.length)]
       );
     } else {
-      // If the channel ID doesn't exist, log an error
       console.error("Channel not found.");
     }
   } else {
-    // If the guild ID doesn't exist, log an error
     console.error("Guild not found.");
   }
 });
@@ -55,8 +49,7 @@ client.once(Events.ClientReady, () => {
 // Event listener for when a new message is created in any channel the bot has access to
 client.on(Events.MessageCreate, handleMessage); // Use the handleMessage function to respond to messages
 
-// Log in to Discord using the bot token from the config file
 client
   .login(config.discordToken)
-  .then(() => console.log("Bot logged in successfully.")) // Log success message if login is successful
-  .catch((err) => console.error("Failed to log in:", err)); // Log an error if login fails
+  .then(() => console.log("Bot logged in successfully."))
+  .catch((err) => console.error("Failed to log in:", err));
